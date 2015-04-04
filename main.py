@@ -137,13 +137,13 @@ def main():
     print choices
 
     counterrow = copy.copy(counter)
-    counterrow['Entry'] = 'Count'
-    counterrow['COOK?'] = 'Count'
-    counterrow['MEAT'] = 'Count'
+    counterrow['Entry'] = 'Summary'
+    counterrow['COOK?'] = len([1 for row in choices if row['COOK?'] == '1'])
+    counterrow['MEAT']  = len([1 for row in choices if row['MEAT'] == '1'])
 
     choices.append(counterrow)
 
-    choices.sort(key=lambda k: k['MEAT'], reverse=True)
+    choices.sort(key=lambda k: k['MEAT'], reverse=False)
 
     with codecs.open('tmp.csv', 'wb', encoding='utf-8') as f:
         # write header
