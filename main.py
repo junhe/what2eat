@@ -5,10 +5,11 @@ import random
 import subprocess
 import pprint
 
-def main():
+
+def file_to_table():
     #with codecs.open('./dataset.txt', 'r', encoding='utf-16') as f:
-    with codecs.open('./fullrecipecsv.csv', 'r', encoding='utf-8') as f:
-    #with codecs.open('./toy.txt', 'r') as f:
+    # with codecs.open('./fullrecipecsv.csv', 'r', encoding='utf-8') as f:
+    with codecs.open('./toy.txt', 'r') as f:
         header = False
         table = []
         for line in f:
@@ -24,8 +25,10 @@ def main():
                     row['Recipe'] = row['Recipe'].split('|')
                 table.append(row)
 
-    # print table
+    pprint.pprint( table )
+    return table
 
+def count_meat_and_vege(table):
     # count meat and vege
     meat = 0
     vege = 0
@@ -34,6 +37,13 @@ def main():
             meat += 1
         elif row['MEAT'] == '0':
             vege += 1
+    print meat, vege
+    return meat,vege
+
+
+def main():
+    table = file_to_table()
+    meat,vege = count_meat_and_vege(table)
 
     # get the id of all the meat and vege items
     meatlist = []
@@ -47,8 +57,8 @@ def main():
     print meatlist
     print vegelist
 
-    n_meat = 7
-    n_vege = 7
+    n_meat = 2
+    n_vege = 2
 
     # get the items already marked
     meat_chosen = []
@@ -121,6 +131,7 @@ def main():
 
     choices.sort(key=lambda k: k['MEAT'], reverse=False)
 
+    return
     with codecs.open('tmp.csv', 'wb', encoding='utf-8') as f:
         # write header
         line = ','.join(header) + '\n'
