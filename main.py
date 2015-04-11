@@ -82,7 +82,7 @@ def send_email(tolist, subject):
     FROM = 'ojunhe@gmail.com'
     TO = tolist
     SUBJECT = subject
-    TEXT = "Testing sending mail using gmail servers"
+    TEXT = "Left empty intentionally."
 
     # Prepare actual message
     message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
