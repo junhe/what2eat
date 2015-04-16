@@ -60,11 +60,11 @@ def get_marked_entries(table, meatlist, vegelist):
     vege_chosen = []
 
     for i in meatlist:
-        if table[i]['COOK?'] == '1':
+        if not table[i]['COOK?'].strip() in ['', '0']:
             meat_chosen.append(i)
 
     for i in vegelist:
-        if table[i]['COOK?'] == '1':
+        if not table[i]['COOK?'].strip() in ['', '0']:
             vege_chosen.append(i)
 
     # print meat_chosen
@@ -113,8 +113,8 @@ def main():
     meat,vege = count_meat_and_vege(table)
 
     # in total, how many do you want for each
-    n_meat = 2
-    n_vege = 2
+    n_meat = 0
+    n_vege = 0
 
     meatlist, vegelist = get_meat_vege_id(table)
 
