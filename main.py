@@ -16,8 +16,6 @@ def read_xls_to_table(path):
 
     header = [c.value for c in sheet.rows[0]]
 
-    print header
-
     table = []
     for row in sheet.rows[1:]:
         row = [cell.value if cell.value is not None else '' for cell in row]
@@ -46,7 +44,6 @@ def file_to_table():
                     row['Recipe'] = row['Recipe'].split('|')
                 table.append(row)
 
-    # pprint.pprint( table )
     return table
 
 def count_meat_and_vege(table):
@@ -58,7 +55,6 @@ def count_meat_and_vege(table):
             meat += 1
         elif row['MEAT'] == 0:
             vege += 1
-    # print meat, vege
     return meat,vege
 
 def split_meat_vege_ids(table):
@@ -73,10 +69,7 @@ def split_meat_vege_ids(table):
         else:
             raise RuntimeError("{} is not valid value".format(row['MEAT']))
 
-    # print meat_id_list
-    # print vege_id_list
     return meat_id_list, vege_id_list
-
 
 def is_chosen(value):
     return not value in ('', 0)
@@ -141,7 +134,7 @@ def sample_rows(table, n_meat, n_vege):
     """
     n_meat, n_vege: the number we want
     """
-    print 'will sample', n_meat, n_vege
+    print 'Will sample', n_meat, "meat", n_vege, "vege"
     meat_id_list, vege_id_list = split_meat_vege_ids(table)
 
     meat_chosen, vege_chosen = get_marked_entries(
