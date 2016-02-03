@@ -128,7 +128,7 @@ def send_items_by_email(itemtoentry):
                     itemname = item,
                     entries = ents)
         print subject.encode("utf-8")
-        # send_email(['project.141578026.3993020@todoist.net'], subject.encode('utf-8'))
+        send_email(['project.141578026.3993020@todoist.net'], subject.encode('utf-8'))
 
 
 def print_table(table):
@@ -140,12 +140,7 @@ def sample_from_list(table, n_meat, n_vege):
     """
     n_meat, n_vege: the number we want
     """
-    # seperate to different list
-    print '-----------'
-    print_table(table)
-
     meat_id_list, vege_id_list = split_meat_vege_ids(table)
-    print meat_id_list, vege_id_list
 
     meat_chosen, vege_chosen = get_marked_entries(
             table, meat_id_list, vege_id_list)
@@ -182,6 +177,7 @@ def count_integrands(table):
     return count
 
 def build_table_for_display(table):
+    table = rows_for_cook(table)
 
     count = count_integrands(table)
 
@@ -198,6 +194,8 @@ def build_table_for_display(table):
 
     add_summary_row(table, count)
 
+    table.sort(key=lambda k: k['MEAT'], reverse=False)
+
     return table
 
 def add_summary_row(table, count):
@@ -211,7 +209,11 @@ def add_summary_row(table, count):
 def save_to_csv(table, path):
     with codecs.open(path, 'wb', encoding='utf-8') as f:
         # write header
+        prefix = ['Entry', 'MEAT', 'COOK?']
         header = table[0].keys()
+        header = [x for x in header if not x in prefix]
+        header = prefix + header
+
         line = ','.join(header) + '\n'
         f.write(line)
 
@@ -228,7 +230,8 @@ def save_and_open(table):
     subprocess.call("open -a /Applications/Numbers.app/ {}".format(path), shell=True)
 
 def send_to_todoist(table):
-    count = count_integrands(table)
+    table = rows_for_cook(table)
+    count = count_integrands( table )
 
     isok = raw_input("Is the menu OK? (y/n)")
     if isok.lower() == 'y':
@@ -245,20 +248,17 @@ def send_to_todoist(table):
     else:
         print 'did NOT send to TODOist'
 
+def rows_for_cook(table):
+    return [row for row in table if is_chosen(row['COOK?'])]
 
 def main():
     # table = file_to_table()
     table = read_xls_to_table("./menu.xlsx")
-    # subset
-    table = [row for row in table if is_chosen(row['COOK?'])]
-
     orig_table = copy.deepcopy(table)
 
     meat_chosen, vege_chosen = sample_from_list(table, 2, 1)
 
     table = build_table_for_display(table)
-
-    table.sort(key=lambda k: k['MEAT'], reverse=False)
 
     save_and_open(table)
 
