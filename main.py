@@ -6,6 +6,7 @@ import random
 import subprocess
 import pprint
 import numbers
+import sys
 
 from openpyxl import load_workbook
 
@@ -136,10 +137,11 @@ def print_table(table):
         values = [str(v) if isinstance(v, numbers.Number) else v.encode("utf-8") for v in row.values()]
         print ', '.join(values)
 
-def sample_from_list(table, n_meat, n_vege):
+def sample_rows(table, n_meat, n_vege):
     """
     n_meat, n_vege: the number we want
     """
+    print 'will sample', n_meat, n_vege
     meat_id_list, vege_id_list = split_meat_vege_ids(table)
 
     meat_chosen, vege_chosen = get_marked_entries(
@@ -160,8 +162,9 @@ def sample_from_list(table, n_meat, n_vege):
     meat_chosen = meat_chosen + random.sample(meat_id_list, nmeat_left)
     vege_chosen = vege_chosen + random.sample(vege_id_list, nvege_left)
 
-    return meat_chosen, vege_chosen
+    chosen_ids = meat_chosen + vege_chosen
 
+    return [row for i, row in enumerate(table) if i in chosen_ids]
 
 def mark_chosen_ones(table, meat_chosen, vege_chosen):
     for i,row in enumerate(table):
@@ -177,8 +180,7 @@ def count_integrands(table):
     return count
 
 def build_table_for_display(table):
-    table = rows_for_cook(table)
-
+    table = copy.deepcopy(table)
     count = count_integrands(table)
 
     # build a table for display
@@ -230,7 +232,7 @@ def save_and_open(table):
     subprocess.call("open -a /Applications/Numbers.app/ {}".format(path), shell=True)
 
 def send_to_todoist(table):
-    table = rows_for_cook(table)
+    table = copy.deepcopy(table)
     count = count_integrands( table )
 
     isok = raw_input("Is the menu OK? (y/n)")
@@ -252,17 +254,21 @@ def rows_for_cook(table):
     return [row for row in table if is_chosen(row['COOK?'])]
 
 def main():
-    # table = file_to_table()
+    if len(sys.argv) != 3:
+        print "Usage:", sys.argv[0], "#meat #vege"
+        exit(1)
+    n_meat = int(sys.argv[1])
+    n_vege = int(sys.argv[2])
+
     table = read_xls_to_table("./menu.xlsx")
     orig_table = copy.deepcopy(table)
 
-    meat_chosen, vege_chosen = sample_from_list(table, 2, 1)
+    chosen_rows = sample_rows(table, n_meat, n_vege)
 
-    table = build_table_for_display(table)
+    table_display = build_table_for_display(chosen_rows)
+    save_and_open(table_display)
 
-    save_and_open(table)
-
-    send_to_todoist(orig_table)
+    send_to_todoist(chosen_rows)
 
 if __name__ == '__main__':
     main()
