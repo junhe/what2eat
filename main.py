@@ -266,4 +266,11 @@ def main():
 if __name__ == '__main__':
     main()
 
+"""
+Enter the number of meat and vege entries you need,
+randomly pick them from menu table.
+"""
+
+
+
 
