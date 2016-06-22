@@ -62,17 +62,28 @@ TYPE_EXCLUDED = 0
 TYPE_ADDED = 1
 TYPE_ALWAYS = 2
 
-col_entrytype = 'EntryType'
-col_entryname = 'EntryName'
-col_addentry = 'AddEntry'
-col_ingredients = 'Ingredients'
+COL_ENTRYTYPE = 'EntryType'
+COL_ENTRYNAME = 'EntryName'
+COL_ADDENTRY = 'AddEntry'
+COL_INGREDIENTS = 'Ingredients'
 
 class Menu(object):
-    def __init__(self, path):
-        self._table = Table(read_xls(path))
+    def __init__(self, table=None):
+        if table is None:
+            table = Table([])
+        assert isinstance(table, Table) is True
+        self._table = table
+        self._clean()
+
+    def _clean(self):
+        "Remove all spaces"
+        for row in self._table.rows():
+            for k, v in row.items():
+                if isinstance(v, basestring):
+                    row[k].replace(' ', '')
 
     def sample(self, entrytype, n):
-        ret_table = self._table.filter_equal(col_entrytype, entrytype)\
+        ret_table = self._table.filter_equal(COL_ENTRYTYPE, entrytype)\
                 .sample(n)
         return ret_table
 
@@ -81,14 +92,14 @@ class Menu(object):
         Add all the rows that marked "Add" first,
         if not enough, sample the else
         """
-        ret_table = self._table.filter_equal(col_entrytype, entrytype)\
-                               .filter_equal(col_addentry, TYPE_ADDED)
+        ret_table = self._table.filter_equal(COL_ENTRYTYPE, entrytype)\
+                               .filter_equal(COL_ADDENTRY, TYPE_ADDED)
 
         remaining = n - ret_table.n_rows()
         if remaining > 0:
             sample_table = self._table\
-                    .filter_equal(col_entrytype, entrytype)\
-                    .filter_equal(col_addentry, TYPE_NOT_ADDED)\
+                    .filter_equal(COL_ENTRYTYPE, entrytype)\
+                    .filter_equal(COL_ADDENTRY, TYPE_NOT_ADDED)\
                     .sample(remaining)
             ret_table.extend(sample_table)
         return ret_table
@@ -106,8 +117,35 @@ class Menu(object):
 
         return ret_table
 
+    def ingredients_map(self):
+        i_map = {}
+        for row in self._table.rows():
+            entryname = row[COL_ENTRYNAME]
+            ingredients = self._ingredients(row)
+            for item in ingredients:
+                entries_using_item = i_map.setdefault(item, [])
+                entries_using_item.append(entryname)
+        return IngredientMap(i_map)
+
+    def _ingredients(self, row):
+        return row[COL_INGREDIENTS].split('|')
+
     def __str__(self):
         return str(self._table)
 
+class IngredientMap(object):
+    def __init__(self, d):
+        self._dict = d
 
+    def raw_dict(self):
+        return self._dict
+
+    def __str__(self):
+        for ingr, entrynames in self._dict.items():
+
+
+
+def menu_from_file(path):
+    table = Table(read_xls(path))
+    return Menu(table)
 

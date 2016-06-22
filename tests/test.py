@@ -103,7 +103,7 @@ class TestChineseTable(unittest.TestCase):
 
 class TestMenu(unittest.TestCase):
     def test_n_sample_vege(self):
-        menu = Menu("./tests/menusample.xlsx")
+        menu = menu_from_file("./tests/menusample.xlsx")
 
         rows = menu.sample(TYPE_VEGETABLE, 1).rows()
         self.assertEqual(rows[0]['EntryName'], u'丝瓜蛋汤')
@@ -120,7 +120,7 @@ class TestMenu(unittest.TestCase):
         return entries
 
     def test_n_sample_meat(self):
-        menu = Menu("./tests/menusample.xlsx")
+        menu = menu_from_file("./tests/menusample.xlsx")
 
         sampled_table = menu.sample(TYPE_MEAT, 2)
         rows = sampled_table.rows()
@@ -130,22 +130,38 @@ class TestMenu(unittest.TestCase):
         self.assertNotEqual(rows[0]['EntryName'], rows[1]['EntryName'])
 
     def test_add_and_sample(self):
-        menu = Menu("./tests/menusample.xlsx")
+        menu = menu_from_file("./tests/menusample.xlsx")
 
         sampled_table = menu.add_and_sample(TYPE_MEAT, 2)
         self.assertIn(u'肉末酸豆角', sampled_table.col('EntryName'))
         self.assertEqual(sampled_table.n_rows(), 2)
 
     def test_pick(self):
-        menu = Menu("./tests/menusample.xlsx")
+        menu = menu_from_file("./tests/menusample.xlsx")
 
         picked_table = menu.pick({TYPE_MEAT: 2, TYPE_VEGETABLE: 2})
 
         self.assertEqual(picked_table.n_rows(), 3) # only one vege available
-        meat_entries = picked_table.filter_equal(col_entrytype, TYPE_MEAT)\
-                .col(col_entryname)
+        meat_entries = picked_table.filter_equal(COL_ENTRYTYPE, TYPE_MEAT)\
+                .col(COL_ENTRYNAME)
         for entryname in meat_entries:
             self.assertIn(entryname, self.meat_entries())
+
+    def test_ingredients_to_entry(self):
+        menu = menu_from_file("./tests/menusample.xlsx")
+
+        table = menu.sample(TYPE_VEGETABLE, 1)
+        menu2 = Menu(table)
+        d = menu2.ingredients_map().raw_dict()
+
+        self.assertDictEqual(d, {u'丝瓜': [u'丝瓜蛋汤'],
+            u'蛋': [u'丝瓜蛋汤']})
+
+    def test_split_ingredients(self):
+        menu = Menu()
+        self.assertListEqual(menu._ingredients({COL_INGREDIENTS: "a|b|c"}),
+                ['a', 'b', 'c'])
+
 
 def main():
     unittest.main()
