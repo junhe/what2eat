@@ -27,22 +27,40 @@ class Table(object):
         result = [row for row in self._rows if not row[colname] == value]
         return Table(result)
 
-    def get_row(self, rowid):
-        return self._rows[rowid]
-
     def rows(self):
         return self._rows
 
+    def duplicate(self):
+        return Table(deepcopy(self._rows))
+
+    def col(self, colname):
+        return [row[colname] for row in self._rows]
+
     def sample(self, n):
-        rows = random.sample(self._rows, n)
-        return Table(rows)
+        if self.n_rows() < n:
+            return self.duplicate()
+        else:
+            rows = random.sample(self._rows, n)
+            return Table(rows)
 
     def n_rows(self):
         return len(self._rows)
 
+    def extend(self, table):
+        self._rows.extend( table.duplicate().rows() )
+
+    def __str__(self):
+        ret = table_to_str(self._rows)
+        return ret
+
 
 TYPE_MEAT = 1
 TYPE_VEGETABLE = 0
+
+TYPE_NOT_ADDED = None
+TYPE_EXCLUDED = 0
+TYPE_ADDED = 1
+TYPE_ALWAYS = 2
 
 col_entrytype = 'EntryType'
 col_entryname = 'EntryName'
@@ -54,13 +72,42 @@ class Menu(object):
         self._table = Table(read_xls(path))
 
     def sample(self, entrytype, n):
-        ret_table = self._table.filter_equal(col_entrytype, entrytype)
+        ret_table = self._table.filter_equal(col_entrytype, entrytype)\
+                .sample(n)
         return ret_table
 
+    def add_and_sample(self, entrytype, n):
+        """
+        Add all the rows that marked "Add" first,
+        if not enough, sample the else
+        """
+        ret_table = self._table.filter_equal(col_entrytype, entrytype)\
+                               .filter_equal(col_addentry, TYPE_ADDED)
 
+        remaining = n - ret_table.n_rows()
+        if remaining > 0:
+            sample_table = self._table\
+                    .filter_equal(col_entrytype, entrytype)\
+                    .filter_equal(col_addentry, TYPE_NOT_ADDED)\
+                    .sample(remaining)
+            ret_table.extend(sample_table)
+        return ret_table
 
+    def pick(self, order):
+        """
+        order is a dictionary:
+            {TYPE_MEAT: 8,
+             TYPE_VEGETABLE: 2}
+        """
+        ret_table = Table([])
+        for entrytype, count in order.items():
+            t = self.add_and_sample(entrytype, count)
+            ret_table.extend(t)
 
+        return ret_table
 
+    def __str__(self):
+        return str(self._table)
 
 
 
