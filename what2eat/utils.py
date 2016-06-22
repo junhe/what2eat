@@ -1,6 +1,5 @@
 from openpyxl import load_workbook
 import smtplib
-import getpass
 
 def read_xls(path):
     wb = load_workbook(path)
@@ -65,7 +64,6 @@ def send_email(tolist, subject):
     gmail_user = "ojunhe@gmail.com"
     with open('./email.config', 'r') as f:
         gmail_pwd = f.readline().strip()
-    # gmail_pwd = getpass.getpass('enter your password:')
     FROM = 'ojunhe@gmail.com'
     TO = tolist
     SUBJECT = subject
