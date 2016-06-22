@@ -106,7 +106,7 @@ class TestMenu(unittest.TestCase):
     def test_n_sample_vege(self):
         menu = menu_from_file("./tests/menusample.xlsx")
 
-        rows = menu.sample(TYPE_VEGETABLE, 1).rows()
+        rows = menu.sample(TYPE_VEGETABLE, 1).raw_table().rows()
         self.assertEqual(rows[0]['EntryName'], u'丝瓜蛋汤')
 
     def meat_entries(self):
@@ -123,7 +123,7 @@ class TestMenu(unittest.TestCase):
     def test_n_sample_meat(self):
         menu = menu_from_file("./tests/menusample.xlsx")
 
-        sampled_table = menu.sample(TYPE_MEAT, 2)
+        sampled_table = menu.sample(TYPE_MEAT, 2).raw_table()
         rows = sampled_table.rows()
         self.assertEqual(len(rows), 2)
         self.assertIn(rows[0]['EntryName'], self.meat_entries())
@@ -133,7 +133,7 @@ class TestMenu(unittest.TestCase):
     def test_add_and_sample(self):
         menu = menu_from_file("./tests/menusample.xlsx")
 
-        sampled_table = menu.add_and_sample(TYPE_MEAT, 2)
+        sampled_table = menu.add_and_sample(TYPE_MEAT, 2).raw_table()
         self.assertIn(u'肉末酸豆角', sampled_table.col('EntryName'))
         self.assertEqual(sampled_table.n_rows(), 2)
 
@@ -151,7 +151,7 @@ class TestMenu(unittest.TestCase):
     def test_ingredients_to_entry(self):
         menu = menu_from_file("./tests/menusample.xlsx")
 
-        table = menu.sample(TYPE_VEGETABLE, 1)
+        table = menu.sample(TYPE_VEGETABLE, 1).raw_table()
         menu2 = Menu(table)
         i_map = menu2.ingredients_map()
         d = i_map.raw_dict()
@@ -187,6 +187,26 @@ class TestMenu(unittest.TestCase):
         menu = Menu()
         self.assertListEqual(menu._ingredients({COL_INGREDIENTS: "a|b|c"}),
                 ['a', 'b', 'c'])
+
+    def test_remove(self):
+        menu = menu_from_file("./tests/menusample.xlsx")
+
+        entryname = u'丝瓜蛋汤'
+        self.assertIn(entryname, menu.raw_table().col(COL_ENTRYNAME))
+        menu.remove(u'丝瓜蛋汤')
+        self.assertNotIn(entryname, menu.raw_table().col(COL_ENTRYNAME))
+
+    def test_prompt_and_pick(self):
+        menu = menu_from_file("./tests/menusample.xlsx")
+
+        sampled_table = menu.hand_pick(TYPE_MEAT, 2, test=True).raw_table()
+        rows = sampled_table.rows()
+        self.assertEqual(len(rows), 2)
+        self.assertIn(rows[0]['EntryName'], self.meat_entries())
+        self.assertIn(rows[1]['EntryName'], self.meat_entries())
+        self.assertNotEqual(rows[0]['EntryName'], rows[1]['EntryName'])
+
+
 
 
 def main():

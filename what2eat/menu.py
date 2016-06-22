@@ -22,7 +22,7 @@ class Menu(object):
         if table is None:
             table = Table([])
         assert isinstance(table, Table) is True
-        self._table = table
+        self._table = table.duplicate()
         self._clean()
 
     def _clean(self):
@@ -38,7 +38,7 @@ class Menu(object):
     def sample(self, entrytype, n):
         ret_table = self._table.filter_equal(COL_ENTRYTYPE, entrytype)\
                 .sample(n)
-        return ret_table
+        return Menu(ret_table)
 
     def add_and_sample(self, entrytype, n):
         """
@@ -55,9 +55,43 @@ class Menu(object):
                     .filter_equal(COL_ADDENTRY, TYPE_NOT_ADDED)\
                     .sample(remaining)
             ret_table.extend(sample_table)
-        return ret_table
+        return Menu(ret_table)
 
-    def pick(self, order):
+    def hand_pick(self, entrytype, n, test=False):
+        work_menu = Menu(self._table.filter_equal(COL_ENTRYTYPE, entrytype))
+        ret_menu = Menu()
+        remaining = n
+
+        while remaining > 0 and work_menu.raw_table().n_rows() > 0:
+            single_menu = work_menu.sample(entrytype, 1)
+            entryname = single_menu.raw_table().rows()[0][COL_ENTRYNAME]
+
+            print str(single_menu)
+
+            if test is False:
+                ans = raw_input('Keep this entry? (y/n)[n]: ')
+            else:
+                ans = 'y'
+
+            if ans.lower().strip() == 'y':
+                ret_menu.extend(single_menu)
+                remaining -= 1
+
+            work_menu.remove(entryname)
+
+        return ret_menu
+
+    def duplicate(self):
+        return Menu(self._table.duplicate())
+
+    def remove(self, entryname):
+        self._table = self._table.filter_not_equal(COL_ENTRYNAME, entryname)
+
+    def extend(self, other_menu):
+        assert isinstance(other_menu, Menu)
+        self._table.extend(other_menu.raw_table())
+
+    def pick(self, order, byhand=False):
         """
         order is a dictionary:
             {TYPE_MEAT: 8,
@@ -65,7 +99,10 @@ class Menu(object):
         """
         ret_table = Table([])
         for entrytype, count in order.items():
-            t = self.add_and_sample(entrytype, count)
+            if byhand is True:
+                t = self.hand_pick(entrytype, count).raw_table()
+            else:
+                t = self.add_and_sample(entrytype, count).raw_table()
             ret_table.extend(t)
 
         return Menu(ret_table)
