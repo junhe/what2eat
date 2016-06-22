@@ -1,7 +1,6 @@
 from copy import deepcopy
 import random
 
-from table import *
 from utils import *
 
 """
@@ -82,6 +81,9 @@ class Menu(object):
                 if isinstance(v, basestring):
                     row[k].replace(' ', '')
 
+    def raw_table(self):
+        return self._table
+
     def sample(self, entrytype, n):
         ret_table = self._table.filter_equal(COL_ENTRYTYPE, entrytype)\
                 .sample(n)
@@ -128,21 +130,41 @@ class Menu(object):
         return IngredientMap(i_map)
 
     def _ingredients(self, row):
-        return row[COL_INGREDIENTS].split('|')
+        return row[COL_INGREDIENTS].split(u'|')
 
     def __str__(self):
         return str(self._table)
 
+
 class IngredientMap(object):
     def __init__(self, d):
         self._dict = d
+        self._email_addr = 'project.141578026.3993020@todoist.net'
 
     def raw_dict(self):
         return self._dict
 
-    def __str__(self):
-        for ingr, entrynames in self._dict.items():
+    def flatten(self, ingr, entrynames):
+        entrystr = u','.join(entrynames)
+        return u"{} ({})".format(ingr, entrystr)
 
+    def text_lines(self):
+        strlist = []
+        for ingr, entrynames in self._dict.items():
+            strlist.append( self.flatten(ingr, entrynames) )
+
+        return strlist
+
+    def __unicode__(self):
+        return u'\n'.join(self.text_lines())
+
+    def __str__(self):
+        return tobytes(unicode(self))
+
+    def send_to_todoist(self):
+        text_lines = self.text_lines()
+        for line in text_lines:
+            send_email([self._email_addr], tobytes(line))
 
 
 def menu_from_file(path):

@@ -1,4 +1,6 @@
 from openpyxl import load_workbook
+import smtplib
+import getpass
 
 def read_xls(path):
     wb = load_workbook(path)
@@ -52,6 +54,34 @@ def table_to_str(table, adddic=None, sep=';', width=32):
 
     return tablestr.encode('utf-8')
 
+
+def tobytes(s):
+    if isinstance(s, unicode):
+        return s.encode('utf-8')
+    else:
+        return s
+
+def send_email(tolist, subject):
+    gmail_user = "ojunhe@gmail.com"
+    with open('./email.config', 'r') as f:
+        gmail_pwd = f.readline().strip()
+    # gmail_pwd = getpass.getpass('enter your password:')
+    FROM = 'ojunhe@gmail.com'
+    TO = tolist
+    SUBJECT = subject
+    TEXT = "Left empty intentionally."
+
+    # Prepare actual message
+    message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
+    """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
+
+    server = smtplib.SMTP("smtp.gmail.com", 587) #or port 465 doesn't seem to work!
+    server.ehlo()
+    server.starttls()
+    server.login(gmail_user, gmail_pwd)
+    server.sendmail(FROM, TO, message)
+    server.close()
+    print 'successfully sent the mail'
 
 
 

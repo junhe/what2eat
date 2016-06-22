@@ -152,10 +152,35 @@ class TestMenu(unittest.TestCase):
 
         table = menu.sample(TYPE_VEGETABLE, 1)
         menu2 = Menu(table)
-        d = menu2.ingredients_map().raw_dict()
+        i_map = menu2.ingredients_map()
+        d = i_map.raw_dict()
 
         self.assertDictEqual(d, {u'丝瓜': [u'丝瓜蛋汤'],
             u'蛋': [u'丝瓜蛋汤']})
+
+    def test_multiple_entries(self):
+        menu = menu_from_file("./tests/menusample.xlsx")
+        table = menu.raw_table()
+
+        t = table.filter_equal(COL_ENTRYNAME, u'肉末酸豆角')
+        t2 = table.filter_equal(COL_ENTRYNAME, u'辣椒酿')
+        t.extend(t2)
+
+        new_menu = Menu(t)
+
+        i_map = new_menu.ingredients_map()
+        text_lines = i_map.text_lines()
+
+        self.assertIn(u'肉末 (肉末酸豆角,辣椒酿)', text_lines)
+
+    def test_flatten(self):
+        i_map = IngredientMap({u'丝瓜': [u'丝瓜蛋汤'],
+                               u'蛋': [u'丝瓜蛋汤']})
+        lines = i_map.text_lines()
+
+        self.assertIn(u'丝瓜 (丝瓜蛋汤)', lines)
+        self.assertIn(u'蛋 (丝瓜蛋汤)', lines)
+        self.assertEqual(len(lines), 2)
 
     def test_split_ingredients(self):
         menu = Menu()
