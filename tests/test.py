@@ -3,6 +3,7 @@ import unittest
 
 from what2eat.utils import *
 from what2eat.table import *
+from what2eat.menu import *
 
 class TestReadingXLS(unittest.TestCase):
     def test_simple(self):
