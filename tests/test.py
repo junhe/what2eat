@@ -140,7 +140,7 @@ class TestMenu(unittest.TestCase):
     def test_pick(self):
         menu = menu_from_file("./tests/menusample.xlsx")
 
-        picked_table = menu.pick({TYPE_MEAT: 2, TYPE_VEGETABLE: 2})
+        picked_table = menu.pick({TYPE_MEAT: 2, TYPE_VEGETABLE: 2}).raw_table()
 
         self.assertEqual(picked_table.n_rows(), 3) # only one vege available
         meat_entries = picked_table.filter_equal(COL_ENTRYTYPE, TYPE_MEAT)\

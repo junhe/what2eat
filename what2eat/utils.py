@@ -81,7 +81,6 @@ def send_email(tolist, subject):
     server.login(gmail_user, gmail_pwd)
     server.sendmail(FROM, TO, message)
     server.close()
-    print 'successfully sent the mail'
 
 
 

@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 from .table import *
 from .utils import *
 
 
+TYPE_PERMANENT = 2
 TYPE_MEAT = 1
 TYPE_VEGETABLE = 0
 
@@ -66,7 +68,11 @@ class Menu(object):
             t = self.add_and_sample(entrytype, count)
             ret_table.extend(t)
 
-        return ret_table
+        return Menu(ret_table)
+
+    def send_ingredients_map(self, email_addr):
+        i_map = self.ingredients_map()
+        i_map.send_to_todoist(email_addr)
 
     def ingredients_map(self):
         i_map = {}
@@ -88,7 +94,6 @@ class Menu(object):
 class IngredientMap(object):
     def __init__(self, d):
         self._dict = d
-        self._email_addr = 'project.141578026.3993020@todoist.net'
 
     def raw_dict(self):
         return self._dict
@@ -110,10 +115,11 @@ class IngredientMap(object):
     def __str__(self):
         return tobytes(unicode(self))
 
-    def send_to_todoist(self):
+    def send_to_todoist(self, email_addr):
         text_lines = self.text_lines()
         for line in text_lines:
-            send_email([self._email_addr], tobytes(line))
+            send_email([email_addr], tobytes(line))
+            print 'Sent', tobytes(line)
 
 
 def menu_from_file(path):
