@@ -60,7 +60,7 @@ def tobytes(s):
     else:
         return s
 
-def send_email_by_gmail(tolist, subject, content, username, password_path):
+def send_email_by_gmail(tolist, username, password_path, subject, content):
     gmail_user = "{}@gmail.com".format(username)
     with open(password_path, 'r') as f:
         gmail_pwd = f.readline().strip()
