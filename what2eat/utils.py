@@ -60,23 +60,18 @@ def tobytes(s):
     else:
         return s
 
-def send_email_by_gmail(tolist, username, password_path, subject, content):
-    gmail_user = "{}@gmail.com".format(username)
-    with open(password_path, 'r') as f:
-        gmail_pwd = f.readline().strip()
-    mail_from = gmail_user
-    mail_to = tolist
-    subject = subject
+def send_email_by_gmail(mail_to_list, username, password, subject, content):
+    gmail_addr = "{}@gmail.com".format(username)
 
     # Prepare actual message
     message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
-    """ % (mail_from, ", ".join(mail_to), subject, content)
+    """ % (gmail_addr, ", ".join(mail_to_list), subject, content)
 
     server = smtplib.SMTP("smtp.gmail.com", 587) #or port 465 doesn't seem to work!
     server.ehlo()
     server.starttls()
-    server.login(gmail_user, gmail_pwd)
-    server.sendmail(mail_from, mail_to, message)
+    server.login(gmail_addr, password)
+    server.sendmail(gmail_addr, mail_to_list, message)
     server.close()
 
 
