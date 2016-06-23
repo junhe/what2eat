@@ -60,24 +60,23 @@ def tobytes(s):
     else:
         return s
 
-def send_email(tolist, subject):
-    gmail_user = "ojunhe@gmail.com"
-    with open('./email.config', 'r') as f:
+def send_email_by_gmail(tolist, subject, content, username, password_path):
+    gmail_user = "{}@gmail.com".format(username)
+    with open(password_path, 'r') as f:
         gmail_pwd = f.readline().strip()
-    FROM = 'ojunhe@gmail.com'
-    TO = tolist
-    SUBJECT = subject
-    TEXT = "Left empty intentionally."
+    mail_from = gmail_user
+    mail_to = tolist
+    subject = subject
 
     # Prepare actual message
     message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
-    """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
+    """ % (mail_from, ", ".join(mail_to), subject, content)
 
     server = smtplib.SMTP("smtp.gmail.com", 587) #or port 465 doesn't seem to work!
     server.ehlo()
     server.starttls()
     server.login(gmail_user, gmail_pwd)
-    server.sendmail(FROM, TO, message)
+    server.sendmail(mail_from, mail_to, message)
     server.close()
 
 

@@ -155,7 +155,12 @@ class IngredientMap(object):
     def send_to_todoist(self, email_addr):
         text_lines = self.text_lines()
         for line in text_lines:
-            send_email([email_addr], tobytes(line))
+            send_email_by_gmail(
+                tolist=[email_addr],
+                subject=tobytes(line),
+                content='Left blank intentionally.',
+                username='ojunhe',
+                password_path='./email.config')
             print 'Sent', tobytes(line)
 
 
