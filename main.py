@@ -2,14 +2,14 @@
 import argparse
 from what2eat.menu import *
 
-def create_menu(n_meat, n_vege, byhand):
+def create_menu(n_meat, n_vege, mode):
     menu = menu_from_file('menu.xlsx')
     picked = menu.pick(order={
         TYPE_MEAT: n_meat,
         TYPE_VEGETABLE: n_vege,
         TYPE_PERMANENT: 1,
         },
-        byhand=byhand
+        mode=mode
         )
 
     print '================================================ MENU =================================================='
@@ -28,10 +28,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', '--meat', default=0, action='store')
     parser.add_argument('-v', '--vegetable', default=0, action='store')
-    parser.add_argument('-b', '--byhand', action='store_true')
+    parser.add_argument('-d', '--mode', default='semi', action='store',
+            help='hand/auto/semi')
     args = parser.parse_args()
 
-    create_menu(int(args.meat), int(args.vegetable), args.byhand)
+    create_menu(int(args.meat), int(args.vegetable), args.mode)
 
 if __name__ == '__main__':
     main()

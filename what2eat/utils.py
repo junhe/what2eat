@@ -32,7 +32,7 @@ def table_to_str(table, adddic=None, sep=';', width=32):
         data   data   data ..
     """
     if len(table) == 0:
-        return None
+        return ""
 
     tablestr = ''
     colnames = table[0].keys()

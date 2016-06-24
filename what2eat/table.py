@@ -3,15 +3,6 @@ import random
 
 from utils import *
 
-"""
-- Read Excel file
-- Generate a table with contents of the excel file
-- Pick n meat items
-- Pick m vege items
-- Send the ingredients to TODOist
-- Save generated menu as Numbers file
-"""
-
 class Table(object):
     def __init__(self, rows):
         self._rows = deepcopy(rows)

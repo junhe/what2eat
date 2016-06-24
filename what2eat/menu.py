@@ -2,7 +2,6 @@
 from .table import *
 from .utils import *
 
-
 TYPE_PERMANENT = 2
 TYPE_MEAT = 1
 TYPE_VEGETABLE = 0
@@ -40,6 +39,27 @@ class Menu(object):
                 .sample(n)
         return Menu(ret_table)
 
+    def pick(self, order, mode):
+        """
+        order is a dictionary:
+            {TYPE_MEAT: 8,
+             TYPE_VEGETABLE: 2}
+        """
+        ret_table = Table([])
+        for entrytype, count in order.items():
+            if mode == 'hand':
+                t = self.hand_pick(entrytype, count).raw_table()
+            elif mode == 'auto':
+                t = self.add_and_sample(entrytype, count).raw_table()
+            elif mode == 'semi':
+                t = self.semi_hand_pick(entrytype, count).raw_table()
+            else:
+                raise NotImplementedError()
+
+            ret_table.extend(t)
+
+        return Menu(ret_table)
+
     def add_and_sample(self, entrytype, n):
         """
         Add all the rows that marked "Add" first,
@@ -47,14 +67,33 @@ class Menu(object):
         """
         ret_table = self._table.filter_equal(COL_ENTRYTYPE, entrytype)\
                                .filter_equal(COL_ADDENTRY, TYPE_ADDED)
-
         remaining = n - ret_table.n_rows()
+
         if remaining > 0:
             sample_table = self._table\
                     .filter_equal(COL_ENTRYTYPE, entrytype)\
                     .filter_equal(COL_ADDENTRY, TYPE_NOT_ADDED)\
                     .sample(remaining)
             ret_table.extend(sample_table)
+        return Menu(ret_table)
+
+    def semi_hand_pick(self, entrytype, n, test=False):
+        ret_table = self._table.filter_equal(COL_ENTRYTYPE, entrytype)\
+                               .filter_equal(COL_ADDENTRY, TYPE_ADDED)
+        print "********* You already have picked **********"
+        print str(Menu(ret_table))
+        print "********************************************"
+        remaining = n - ret_table.n_rows()
+
+        if remaining > 0:
+            table_left = self._table\
+                    .filter_equal(COL_ENTRYTYPE, entrytype)\
+                    .filter_equal(COL_ADDENTRY, TYPE_NOT_ADDED)
+            menu_left = Menu(table_left)
+            hand_picked_menu = menu_left.hand_pick(entrytype, remaining,
+                    test=test)
+            ret_table.extend(hand_picked_menu.raw_table())
+
         return Menu(ret_table)
 
     def hand_pick(self, entrytype, n, test=False):
@@ -90,22 +129,6 @@ class Menu(object):
     def extend(self, other_menu):
         assert isinstance(other_menu, Menu)
         self._table.extend(other_menu.raw_table())
-
-    def pick(self, order, byhand=False):
-        """
-        order is a dictionary:
-            {TYPE_MEAT: 8,
-             TYPE_VEGETABLE: 2}
-        """
-        ret_table = Table([])
-        for entrytype, count in order.items():
-            if byhand is True:
-                t = self.hand_pick(entrytype, count).raw_table()
-            else:
-                t = self.add_and_sample(entrytype, count).raw_table()
-            ret_table.extend(t)
-
-        return Menu(ret_table)
 
     def send_ingredients_map(self, email_addr):
         i_map = self.ingredients_map()

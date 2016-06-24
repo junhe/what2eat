@@ -140,7 +140,8 @@ class TestMenu(unittest.TestCase):
     def test_pick(self):
         menu = menu_from_file("./tests/menusample.xlsx")
 
-        picked_table = menu.pick({TYPE_MEAT: 2, TYPE_VEGETABLE: 2}).raw_table()
+        picked_table = menu.pick({TYPE_MEAT: 2, TYPE_VEGETABLE: 2},
+                mode='auto').raw_table()
 
         self.assertEqual(picked_table.n_rows(), 3) # only one vege available
         meat_entries = picked_table.filter_equal(COL_ENTRYTYPE, TYPE_MEAT)\
@@ -206,7 +207,15 @@ class TestMenu(unittest.TestCase):
         self.assertIn(rows[1]['EntryName'], self.meat_entries())
         self.assertNotEqual(rows[0]['EntryName'], rows[1]['EntryName'])
 
+    def test_semi_prompt_and_pick(self):
+        menu = menu_from_file("./tests/menusample.xlsx")
 
+        sampled_table = menu.semi_hand_pick(TYPE_MEAT, 2, test=True).raw_table()
+        rows = sampled_table.rows()
+        self.assertEqual(len(rows), 2)
+        self.assertIn(rows[0]['EntryName'], self.meat_entries())
+        self.assertIn(rows[1]['EntryName'], self.meat_entries())
+        self.assertNotEqual(rows[0]['EntryName'], rows[1]['EntryName'])
 
 
 def main():
