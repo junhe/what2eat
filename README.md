@@ -6,6 +6,6 @@ To use:
 
 ```
 sudo pip install openpyxl
-python main.py --meat 4 --vegetable 4 --byhand
+python main.py --meat 4 --vegetable 4
 ```
 
