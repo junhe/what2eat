@@ -35,7 +35,7 @@ def table_to_str(table, adddic=None, sep=';', width=32):
         return ""
 
     tablestr = ''
-    colnames = table[0].keys()
+    colnames = sorted(table[0].keys())
     if adddic != None:
         colnames += adddic.keys()
     colnamestr = sep.join([adjust_width(s, width=width) for s in colnames]) + '\n'
