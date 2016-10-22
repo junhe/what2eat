@@ -5,6 +5,7 @@ from .utils import *
 TYPE_PERMANENT = 2
 TYPE_MEAT = 1
 TYPE_VEGETABLE = 0
+TYPE_CHARLIE = 3
 
 TYPE_NOT_ADDED = None
 TYPE_EXCLUDED = 0
@@ -45,8 +46,10 @@ class Menu(object):
             {TYPE_MEAT: 8,
              TYPE_VEGETABLE: 2}
         """
+        print 'orderrrrrrrrrrrrrrrrrr', order
         ret_table = Table([])
         for entrytype, count in order.items():
+            print 'ENTRY TYPE', entrytype
             if mode == 'hand':
                 t = self.hand_pick(entrytype, count).raw_table()
             elif mode == 'auto':
