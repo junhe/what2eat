@@ -61,7 +61,7 @@ class Menu(object):
 
             ret_table.extend(t)
 
-        return Menu(ret_table)
+        return Menu(ret_table.remove_col('AddEntry'))
 
     def add_and_sample(self, entrytype, n):
         """
@@ -152,6 +152,11 @@ class Menu(object):
 
     def __str__(self):
         return str(self._table)
+
+    def save(self, path):
+        with open(path, 'w') as f:
+            f.write(str(self._table))
+
 
 
 class IngredientMap(object):

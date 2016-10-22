@@ -26,6 +26,12 @@ class Table(object):
     def col(self, colname):
         return [row[colname] for row in self._rows]
 
+    def remove_col(self, colname):
+        for row in self._rows:
+            del row[colname]
+
+        return Table(self._rows)
+
     def sample(self, n):
         if self.n_rows() < n:
             return self.duplicate()
@@ -40,6 +46,6 @@ class Table(object):
         self._rows.extend( table.duplicate().rows() )
 
     def __str__(self):
-        ret = table_to_str(self._rows)
+        ret = table_to_str(self._rows, sep=',')
         return ret
 

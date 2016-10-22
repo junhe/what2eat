@@ -15,6 +15,7 @@ def create_menu(n_meat, n_vege, mode, n_charlie):
 
     print '================================================ MENU =================================================='
     print str(picked)
+    picked.save('current-menu.csv')
     send(picked)
 
 def send(picked):
