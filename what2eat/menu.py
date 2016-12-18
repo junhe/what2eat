@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
+import time
+import os
+from pytodoist import todoist
+
 from .table import *
 from .utils import *
+
 
 TYPE_PERMANENT = 2
 TYPE_MEAT = 1
@@ -133,9 +138,9 @@ class Menu(object):
         assert isinstance(other_menu, Menu)
         self._table.extend(other_menu.raw_table())
 
-    def send_ingredients_map(self, email_addr):
+    def send_ingredients_map(self):
         i_map = self.ingredients_map()
-        i_map.send_to_todoist(email_addr)
+        i_map.send_to_todoist()
 
     def ingredients_map(self):
         i_map = {}
@@ -183,22 +188,22 @@ class IngredientMap(object):
     def __str__(self):
         return tobytes(unicode(self))
 
-    def _read_password(self):
-        with open('./email.config', 'r') as f:
-            gmail_pwd = f.readline().strip()
-
-        return gmail_pwd
-
-    def send_to_todoist(self, email_addr):
+    def send_to_todoist(self):
         text_lines = self.text_lines()
 
+        token_path = './todoist_api_token.config'
+        if not os.path.exists(token_path):
+            print 'Token file missing', token_path
+            exit(1)
+
+        with open(token_path, 'r') as f:
+            token = f.readline().strip()
+
+        user = todoist.login_with_api_token(token)
+        errands = user.get_project('Errands')
+
         for line in text_lines:
-            send_email_by_gmail(
-                mail_to_list=[email_addr],
-                username='ojunhe',
-                password=self._read_password(),
-                subject=tobytes(line),
-                content='Left blank intentionally.')
+            errands.add_task(line)
             print 'Sent', tobytes(line)
 
 

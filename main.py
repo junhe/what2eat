@@ -21,7 +21,7 @@ def create_menu(n_meat, n_vege, mode, n_charlie):
 def send(picked):
     ans = raw_input("Send to TODOist? (y/n): ")
     if ans.lower().strip() == 'y':
-        picked.send_ingredients_map('project.141578026.3993020@todoist.net')
+        picked.send_ingredients_map()
         print 'All ingredients sent to TODOist'
         print str(picked)
 
