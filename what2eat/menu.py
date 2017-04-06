@@ -150,7 +150,8 @@ class Menu(object):
             for item in ingredients:
                 entries_using_item = i_map.setdefault(item, [])
                 entries_using_item.append(entryname)
-        return IngredientMap(i_map)
+        storemap = StoreMap("./item-map.txt")
+        return IngredientMap(i_map, storemap)
 
     def _ingredients(self, row):
         return row[COL_INGREDIENTS].split(u'|')
@@ -163,10 +164,29 @@ class Menu(object):
             f.write(str(self._table))
 
 
+class StoreMap(object):
+    def __init__(self, map_path=None):
+        if map_path is None:
+            self.d = {}
+        else:
+            self.d = load_map(map_path)
+
+    def storename(self, item_name):
+        item_name = tobytes(item_name)
+        if self.d.has_key(item_name):
+            return self.d[item_name]
+        else:
+            return "UNKONWN"
+
 
 class IngredientMap(object):
-    def __init__(self, d):
+    def __init__(self, d, store_map = None):
         self._dict = d
+
+        if store_map is None:
+            self.store_map = StoreMap()
+        else:
+            self.store_map = store_map
 
     def raw_dict(self):
         return self._dict
@@ -174,6 +194,18 @@ class IngredientMap(object):
     def flatten(self, ingr, entrynames):
         entrystr = u','.join(entrynames)
         return u"{} ({})".format(ingr, entrystr)
+
+    def get_structure(self):
+        structure = {}
+        for ingr, entrynames in self._dict.items():
+            store = self.store_map.storename(tobytes(ingr))
+            print ingr, entrynames, store
+            line = self.flatten(ingr, entrynames)
+            if not structure.has_key(store):
+                structure[store] = []
+            structure[store].append(line)
+
+        return structure
 
     def text_lines(self):
         strlist = []
@@ -189,8 +221,22 @@ class IngredientMap(object):
         return tobytes(unicode(self))
 
     def send_to_todoist(self):
-        text_lines = self.text_lines()
+        structure = self.get_structure()
 
+        token = self.get_token()
+        user = todoist.login_with_api_token(token)
+        errands = user.get_project('Errands')
+
+        for store, lines in structure.items():
+            print store
+            errands.add_task(tobytes(store))
+            for line in lines:
+                print line
+                task = errands.add_task(tobytes(line))
+                task.indent = 2
+                task.update()
+
+    def get_token(self):
         token_path = './todoist_api_token.config'
         if not os.path.exists(token_path):
             print 'Token file missing', token_path
@@ -199,13 +245,7 @@ class IngredientMap(object):
         with open(token_path, 'r') as f:
             token = f.readline().strip()
 
-        user = todoist.login_with_api_token(token)
-        errands = user.get_project('Errands')
-
-        for line in text_lines:
-            errands.add_task(line)
-            print 'Sent', tobytes(line)
-
+        return token
 
 def menu_from_file(path):
     table = Table(read_xls(path))

@@ -184,6 +184,18 @@ class TestMenu(unittest.TestCase):
         self.assertIn(u'蛋 (丝瓜蛋汤)', lines)
         self.assertEqual(len(lines), 2)
 
+    def test_building_structure(self):
+        storemap = StoreMap("./item-map.txt")
+        i_map = IngredientMap({u'丝瓜': [u'丝瓜蛋汤'],
+                               u'蛋': [u'丝瓜蛋汤']},
+                storemap)
+
+        structure = i_map.get_structure()
+
+        self.assertDictEqual(structure,
+                {u"Wenhua": [u'丝瓜 (丝瓜蛋汤)'],
+                 u"Costco": [u'蛋 (丝瓜蛋汤)']})
+
     def test_split_ingredients(self):
         menu = Menu()
         self.assertListEqual(menu._ingredients({COL_INGREDIENTS: "a|b|c"}),
@@ -216,6 +228,18 @@ class TestMenu(unittest.TestCase):
         self.assertIn(rows[0]['EntryName'], self.meat_entries())
         self.assertIn(rows[1]['EntryName'], self.meat_entries())
         self.assertNotEqual(rows[0]['EntryName'], rows[1]['EntryName'])
+
+
+class TestItemMap(unittest.TestCase):
+    def test_map(self):
+        d = load_map("./item-map.txt")
+        self.assertEqual(d['香茹'], 'Wenhua')
+
+    def test_map_class(self):
+        mymap = StoreMap("./item-map.txt")
+        self.assertEqual(mymap.storename('香茹'), 'Wenhua')
+        self.assertEqual(mymap.storename('香茹xx'), 'UNKONWN')
+
 
 
 def main():

@@ -74,6 +74,14 @@ def send_email_by_gmail(mail_to_list, username, password, subject, content):
     server.sendmail(gmail_addr, mail_to_list, message)
     server.close()
 
+def load_map(mapfile):
+    d = {}
+    with open(mapfile, 'r') as f:
+        for line in f:
+            line = line.strip()
+            k, v = line.split(",")
+            d[k.strip()] = v.strip()
 
+    return d
 
 
