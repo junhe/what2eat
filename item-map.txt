@@ -335,3 +335,11 @@ firm豆腐,Wenhua
 swai鱼片,Sentry
 红油,Wenhua
 猪手,Wenhua
+cheese,Sentry
+软豆腐,Wenhua
+salad,Costco
+烧烤酱,Wenhua
+叉烧酱,Wenhua
+Honey,Sentry
+pork shoulder,Sentry
+长排骨,Costco
