@@ -343,3 +343,36 @@ salad,Costco
 Honey,Sentry
 pork shoulder,Sentry
 长排骨,Costco
+swai,Sentry
+海底捞酸汤鱼料,Wenhua
+water,Costco
+Spaghetti-whole-wheat,Sentry
+Bread-whole-wheat,Sentry
+VegetableMix,Costco
+Artichoke,Sentry
+Green peas,Sentry
+Broccoli,Sentry
+Turnip greens,Sentry
+Brussels sprouts,Sentry
+Sweet corn,Sentry
+Potato,Sentry
+Tomato,Sentry
+Carrot,Wenhua
+Raspberries,Sentry
+Pear,Sentry
+Apple,Sentry
+Banana,Sentry
+Orange,Sentry
+Strawberries,Sentry
+Figs,Sentry
+Raisins,Sentry
+Split peas,Sentry
+Lentils,Sentry
+Black beans,Sentry
+Lima beans,Sentry
+Baked beans,Sentry
+Almonds,Sentry
+Pistachio nuts,Sentry
+Pecans,Sentry
+Brown rice,Wenhua
+Purified water,Sentry
