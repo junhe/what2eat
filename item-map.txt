@@ -375,4 +375,7 @@ Almonds,Sentry
 Pistachio nuts,Sentry
 Pecans,Sentry
 Brown rice,Wenhua
-Purified water,Sentry
+Purified Gallon Water,Costco
+无盐黄油,Sentry
+韭菜,Wenhua
+Zuccini,Wenhua

@@ -235,6 +235,7 @@ class IngredientMap(object):
                 task = errands.add_task(tobytes(line))
                 task.indent = 2
                 task.update()
+                time.sleep(0.3)
 
     def get_token(self):
         token_path = './todoist_api_token.config'
